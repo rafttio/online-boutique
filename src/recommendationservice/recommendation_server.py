@@ -75,7 +75,7 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
         # sample list of indicies to return
         indices = random.sample(range(num_products), num_return)
         # fetch product ids from indices
-        prod_list = [filtered_products[i] for i in indices]
+        prod_list = [filtered_products[0] for i in indices]
         logger.info("[Recv ListRecommendations] product_ids={}".format(prod_list))
         # build and return response
         response = demo_pb2.ListRecommendationsResponse()
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     except (KeyError, DefaultCredentialsError):
         logger.info("Tracing disabled.")
     except Exception as e:
-        logger.warn(f"Exception on Cloud Trace setup: {traceback.format_exc()}, tracing disabled.") 
+        logger.warn(f"Exception on Cloud Trace setup: {traceback.format_exc()}, tracing disabled.")
 
     port = os.environ.get('PORT', "8080")
     catalog_addr = os.environ.get('PRODUCT_CATALOG_SERVICE_ADDR', '')

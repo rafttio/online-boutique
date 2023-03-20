@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="frontend" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="online-boutique" />
+    <working_directory value="$PROJECT_DIR$/src/frontend" />
+    <envs>
+      <env name="RAFTT_WORKLOAD" value="frontend" />
+    </envs>
+    <kind value="DIRECTORY" />
+    <directory value="$PROJECT_DIR$/src/frontend" />
+    <filePath value="$PROJECT_DIR$" />
+    <method v="2" />
+  </configuration>
+</component>

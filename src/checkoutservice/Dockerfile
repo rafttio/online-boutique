@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.20.2-alpine@sha256:405962195c7fd525604cb74ab86cb7c88fcfc30af0e31a5b3c0636a7c4e9e567 as builder
+FROM golang:1.20.2-alpine3.17
 RUN apk add --no-cache ca-certificates git
 RUN apk add build-base
+
+ENV GRPC_HEALTH_PROBE_VERSION=v0.4.15
+RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    chmod +x /bin/grpc_health_probe
+
 WORKDIR /src
 
 # restore dependencies
@@ -22,27 +27,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-
-# Skaffold passes in debug-oriented compiler flags
-ARG SKAFFOLD_GO_GCFLAGS
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -o /checkoutservice .
-
-FROM alpine:3.17.2@sha256:69665d02cb32192e52e07644d76bc6f25abeb5410edc1c7a81a10ba3f0efb90a as without-grpc-health-probe-bin
-RUN apk add --no-cache ca-certificates
-
-WORKDIR /src
-COPY --from=builder /checkoutservice /src/checkoutservice
-
-# Definition of this variable is used by 'skaffold debug' to identify a golang binary.
-# Default behavior - a failure prints a stack trace for the current goroutine.
-# See https://golang.org/pkg/runtime/
-ENV GOTRACEBACK=single
+RUN go build -o /checkout .
 
 EXPOSE 5050
-ENTRYPOINT ["/src/checkoutservice"]
-
-FROM without-grpc-health-probe-bin
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-ENV GRPC_HEALTH_PROBE_VERSION=v0.4.15
-RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-    chmod +x /bin/grpc_health_probe
+ENTRYPOINT ["/checkout"]

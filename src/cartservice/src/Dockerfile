@@ -13,28 +13,31 @@
 # limitations under the License.
 
 # https://mcr.microsoft.com/v2/dotnet/sdk/tags/list
-FROM mcr.microsoft.com/dotnet/sdk:7.0.201@sha256:bd1ccc2332fc03c6df1659ed125f67f02666f9f188947a80cec4e7afd3c7f98d as builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0.402 as builder
+
+ARG TARGETARCH
+
 WORKDIR /app
 COPY cartservice.csproj .
-RUN dotnet restore cartservice.csproj -r linux-musl-x64
+RUN dotnet restore cartservice.csproj -a $TARGETARCH
 COPY . .
-RUN dotnet publish cartservice.csproj -p:PublishSingleFile=true -r linux-musl-x64 --self-contained true -p:PublishTrimmed=True -p:TrimMode=Link -c release -o /cartservice --no-restore
+RUN dotnet publish cartservice.csproj -a $TARGETARCH -c Release -o /cartservice --no-restore
 
-# https://mcr.microsoft.com/v2/dotnet/runtime-deps/tags/list
-FROM mcr.microsoft.com/dotnet/runtime-deps:7.0.3-alpine3.16-amd64@sha256:9db90caf0fe6ac92a900067b0980382db6ecc1670f4e3c6cd926d9e2a6029304 as without-grpc-health-probe-bin
+FROM mcr.microsoft.com/dotnet/aspnet:7.0.12@sha256:77ea66eb200fa06d2929cc937b75724bb2f5cdf2bcf6dc6aaf0851bb75bb631f
 
-WORKDIR /app
+RUN apt-get update \
+    && apt-get install -y unzip procps wget
+
+ARG TARGETARCH
+# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
+ENV GRPC_HEALTH_PROBE_VERSION=v0.4.15
+RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-${TARGETARCH} && \
+    chmod +x /bin/grpc_health_probe
+
 COPY --from=builder /cartservice .
 EXPOSE 7070
 ENV DOTNET_EnableDiagnostics=0 \
     ASPNETCORE_URLS=http://*:7070
 USER 1000
-ENTRYPOINT ["/app/cartservice"]
 
-FROM without-grpc-health-probe-bin
-USER root
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-ENV GRPC_HEALTH_PROBE_VERSION=v0.4.15
-RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-    chmod +x /bin/grpc_health_probe
-USER 1000
+ENTRYPOINT ["dotnet", "cartservice.dll"]
