@@ -12,22 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM eclipse-temurin:19@sha256:9b0ae96f84fc58a2db048671f381d110195fb150c83eebb200ae39eb47fe6e62 as builder
-
+FROM eclipse-temurin:19.0.1_10-jdk-alpine
 WORKDIR /app
 
-COPY ["build.gradle", "gradlew", "./"]
-COPY gradle gradle
-RUN chmod +x gradlew
-RUN ./gradlew downloadRepos
+RUN apk add --no-cache ca-certificates gcompat libstdc++
 
-COPY . .
-RUN chmod +x gradlew
-RUN ./gradlew installDist
-
-FROM eclipse-temurin:19.0.1_10-jre-alpine@sha256:a75ea64f676041562cd7d3a54a9764bbfb357b2bf1bebf46e2af73e62d32e36c as without-grpc-health-probe-bin
-
-RUN apk add --no-cache ca-certificates
+ENV GRPC_HEALTH_PROBE_VERSION=v0.4.15
+RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
+    chmod +x /bin/grpc_health_probe
 
 # Download Stackdriver Profiler Java agent
 RUN mkdir -p /opt/cprof && \
@@ -35,15 +27,12 @@ RUN mkdir -p /opt/cprof && \
     | tar xzv -C /opt/cprof && \
     rm -rf profiler_java_agent.tar.gz
 
-WORKDIR /app
-COPY --from=builder /app .
+COPY ["build.gradle", "gradlew", "./"]
+COPY gradle gradle
+RUN ./gradlew downloadRepos
+
+COPY . .
+RUN ./gradlew shadowJar
 
 EXPOSE 9555
-ENTRYPOINT ["/app/build/install/hipstershop/bin/AdService"]
-
-FROM without-grpc-health-probe-bin
-
-# renovate: datasource=github-releases depName=grpc-ecosystem/grpc-health-probe
-ENV GRPC_HEALTH_PROBE_VERSION=v0.4.15
-RUN wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 && \
-    chmod +x /bin/grpc_health_probe
+ENTRYPOINT ["java", "-agentpath:/opt/cprof/profiler_java_agent.so=-cprof_service=adservice,-cprof_service_version=1.0.0", "-jar", "/app/build/libs/hipstershop-all.jar"]

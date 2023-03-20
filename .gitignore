@@ -6,7 +6,6 @@ pkg/
 *.tfstate
 *.tfstate*
 *~
-.vscode/
 .vs/
 .idea
 .skaffold-*.yaml
