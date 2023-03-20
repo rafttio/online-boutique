@@ -5,6 +5,41 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "checkout",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/src/checkoutservice",
+            "raftt": {
+                "workload": "checkout"
+            }
+        },
+        {
+            "name": "currency",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/currencyservice/server.js",
+            "skipFiles": [
+                "<node_internals>/**",
+            ],
+            "cwd": "${workspaceFolder}/src/currencyservice",
+            "raftt": {
+                "workload": "currency"
+            }
+        },
+        {
+            "name": "email",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/emailservice/email_server.py",
+            "cwd": "${workspaceFolder}/src/emailservice",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "raftt": {
+                "workload": "email"
+            }
+        },
+        {
             "name": "frontend",
             "type": "go",
             "request": "launch",
@@ -12,6 +47,29 @@
             "program": "${workspaceFolder}/src/frontend",
             "raftt": {
                 "workload": "frontend"
+            }
+        },
+        {
+            "name": "payments",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/paymentservice/index.js",
+            "skipFiles": [
+                "<node_internals>/**",
+            ],
+            "cwd": "${workspaceFolder}/src/paymentservice",
+            "raftt": {
+                "workload": "payments"
+            }
+        },
+        {
+            "name": "product-catalog",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/src/productcatalogservice",
+            "raftt": {
+                "workload": "productcatalog"
             }
         },
         {
@@ -25,6 +83,16 @@
             "raftt": {
                 "workload": "recommendations"
             }
-        }
+        },
+        {
+            "name": "shipping",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/src/shippingservice",
+            "raftt": {
+                "workload": "shipping"
+            }
+        },
     ]
 }

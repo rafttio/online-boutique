@@ -31,9 +31,10 @@ emailService:
 frontend:
   create: true
   name: frontend
-  externalService: true
+  externalService: false
   ingress:
-    create: false
+    create: true
+    domain: demo.raftt.io
   cymbalBranding: false
   singleSharedSession: false
 
