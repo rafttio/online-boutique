@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="payments" type="NodeJSConfigurationType" path-to-js-file="index.js" working-dir="$PROJECT_DIR$/src/paymentservice">
+    <envs>
+      <env name="RAFTT_WORKLOAD" value="payments" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>
