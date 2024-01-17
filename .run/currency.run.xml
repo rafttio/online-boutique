@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="currency" type="NodeJSConfigurationType" path-to-js-file="server.js" working-dir="$PROJECT_DIR$/src/currencyservice">
+    <envs>
+      <env name="RAFTT_WORKLOAD" value="currency" />
+    </envs>
+    <method v="2" />
+  </configuration>
+</component>

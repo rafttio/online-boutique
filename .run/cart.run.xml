@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="cart" type="RafttRunExe" factoryName="RafttDotnetExeId">
+    <option name="EXE_PATH" value="remote:///app/cartservice.dll" />
+    <option name="PROGRAM_PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="remote:///app" />
+    <option name="PASS_PARENT_ENVS" value="1" />
+    <envs>
+      <env name="RAFTT_WORKLOAD" value="cart" />
+    </envs>
+    <option name="USE_EXTERNAL_CONSOLE" value="0" />
+    <option name="USE_MONO" value="0" />
+    <option name="RUNTIME_ARGUMENTS" value="" />
+    <method v="2">
+      <option name="Raftt.BeforeRunTask" enabled="true" workload="cart" container="builder" commandLine="raftt stop cart &amp;&amp; dotnet publish cartservice.csproj -c Debug -o /tmp/out" />
+    </method>
+  </configuration>
+</component>
